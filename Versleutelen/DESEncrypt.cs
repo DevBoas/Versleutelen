@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.IO;
+using System.Windows.Forms;
 
 namespace Versleutelen
 {
@@ -22,6 +23,8 @@ namespace Versleutelen
 
         public string EncryptString(string userInput, string password)
         {
+            if (userInput == "")
+                return "";
             byte[] userInputBytes = Encoding.Unicode.GetBytes(userInput);
             MemoryStream myStream = new MemoryStream();
             TripleDES des = CreateDES(password);
@@ -33,14 +36,22 @@ namespace Versleutelen
 
         public string DecryptString(string encryptedText, string password)
         {
-            byte[] encryptedTextBytes = Convert.FromBase64String(encryptedText);
-            MemoryStream myStream = new MemoryStream();
-            TripleDES des = CreateDES(password);
-            CryptoStream decryptStream = new CryptoStream(myStream, des.CreateDecryptor(), CryptoStreamMode.Write);
-            decryptStream.Write(encryptedTextBytes, 0, encryptedTextBytes.Length);
-            decryptStream.FlushFinalBlock();
-
-            return Encoding.Unicode.GetString(myStream.ToArray());
+            string Decrypt = "";
+            try
+            {
+                byte[] encryptedTextBytes = Convert.FromBase64String(encryptedText);
+                MemoryStream myStream = new MemoryStream();
+                TripleDES des = CreateDES(password);
+                CryptoStream decryptStream = new CryptoStream(myStream, des.CreateDecryptor(), CryptoStreamMode.Write);
+                decryptStream.Write(encryptedTextBytes, 0, encryptedTextBytes.Length);
+                decryptStream.FlushFinalBlock();
+                Decrypt = Encoding.Unicode.GetString(myStream.ToArray());
+            }
+            catch
+            {
+                MessageBox.Show("Couldn't decrypt");
+            }
+            return Decrypt;
         }
 
     }
